@@ -1,0 +1,21 @@
+from django.db import models
+from .role import Role
+
+
+class User(models.Model):
+    full_name = models.CharField(max_length=150, verbose_name='ФИО')
+    email = models.EmailField(unique=True, verbose_name='E-mail')
+    phone = models.CharField(max_length=20, blank=True, verbose_name='Телефон')
+    birth_date = models.DateField(blank=True, null=True, verbose_name='Дата рождения')
+    password_hash = models.CharField(max_length=255, verbose_name='Хэш пароля')
+    role = models.ForeignKey(Role, on_delete=models.PROTECT, verbose_name='Роль')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Дата регистрации')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='Дата обновления')
+
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
+        ordering = ['full_name']
+
+    def __str__(self):
+        return self.full_name

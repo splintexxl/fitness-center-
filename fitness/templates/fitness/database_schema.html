@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Даталогическая схема базы данных</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .schema-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            justify-content: center;
+            margin-bottom: 40px;
+        }
+
+        .table-card {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            padding: 20px;
+            min-width: 280px;
+            max-width: 320px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .table-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+
+        .table-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin: -20px -20px 15px -20px;
+            font-weight: bold;
+            font-size: 1.2em;
+            text-align: center;
+        }
+
+        .field {
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: white;
+            border-left: 4px solid #667eea;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .field-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .field-type {
+            color: #666;
+            font-size: 0.85em;
+            margin-left: 8px;
+        }
+
+        .field-constraint {
+            display: inline-block;
+            background: #ffc107;
+            color: #333;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.75em;
+            margin-left: 5px;
+            font-weight: bold;
+        }
+
+        .field-constraint.pk {
+            background: #28a745;
+            color: white;
+        }
+
+        .field-constraint.fk {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .field-constraint.uk {
+            background: #ff9800;
+            color: white;
+        }
+
+        .relationships {
+            margin-top: 40px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .relationships h2 {
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .relationship-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .relationship-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .relationship-item strong {
+            color: #667eea;
+        }
+
+        .legend {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .legend h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .legend-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 3px;
+        }
+
+        .legend-box.pk {
+            background: #28a745;
+        }
+
+        .legend-box.fk {
+            background: #17a2b8;
+        }
+
+        .legend-box.uk {
+            background: #ff9800;
+        }
+
+        .optional {
+            color: #999;
+            font-style: italic;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗄️ Даталогическая схема базы данных</h1>
+        <p class="subtitle">Система управления фитнес-центром</p>
+
+        <div class="schema-container">
+            <!-- Role -->
+            <div class="table-card">
+                <div class="table-header">ROLE (Роль)</div>
+                <div class="field">
+                    <span class="field-name">id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint pk">PK</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">name</span>
+                    <span class="field-type">VARCHAR(50)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">description</span>
+                    <span class="field-type">TEXT</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+            </div>
+
+            <!-- User -->
+            <div class="table-card">
+                <div class="table-header">USER (Пользователь)</div>
+                <div class="field">
+                    <span class="field-name">id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint pk">PK</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">full_name</span>
+                    <span class="field-type">VARCHAR(150)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">email</span>
+                    <span class="field-type">VARCHAR(255)</span>
+                    <span class="field-constraint uk">UNIQUE</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">phone</span>
+                    <span class="field-type">VARCHAR(20)</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">birth_date</span>
+                    <span class="field-type">DATE</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">password_hash</span>
+                    <span class="field-type">VARCHAR(255)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">role_id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint fk">FK → ROLE</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">created_at</span>
+                    <span class="field-type">DATETIME</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">updated_at</span>
+                    <span class="field-type">DATETIME</span>
+                </div>
+            </div>
+
+            <!-- Club -->
+            <div class="table-card">
+                <div class="table-header">CLUB (Клуб)</div>
+                <div class="field">
+                    <span class="field-name">id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint pk">PK</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">name</span>
+                    <span class="field-type">VARCHAR(100)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">city</span>
+                    <span class="field-type">VARCHAR(100)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">address</span>
+                    <span class="field-type">VARCHAR(255)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">phone</span>
+                    <span class="field-type">VARCHAR(20)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">work_hours</span>
+                    <span class="field-type">VARCHAR(100)</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">image</span>
+                    <span class="field-type">VARCHAR(100)</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">description</span>
+                    <span class="field-type">TEXT</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">created_by_id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint fk">FK → USER</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">updated_by_id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint fk">FK → USER</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">created_at</span>
+                    <span class="field-type">DATETIME</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">updated_at</span>
+                    <span class="field-type">DATETIME</span>
+                </div>
+            </div>
+
+            <!-- Trainer -->
+            <div class="table-card">
+                <div class="table-header">TRAINER (Тренер)</div>
+                <div class="field">
+                    <span class="field-name">id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint pk">PK</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">user_id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint fk">FK → USER</span>
+                    <span class="field-constraint uk">UNIQUE</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">club_id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint fk">FK → CLUB</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">specialization</span>
+                    <span class="field-type">VARCHAR(150)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">bio</span>
+                    <span class="field-type">TEXT</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">photo</span>
+                    <span class="field-type">VARCHAR(100)</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">created_by_id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint fk">FK → USER</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">updated_by_id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint fk">FK → USER</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">created_at</span>
+                    <span class="field-type">DATETIME</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">updated_at</span>
+                    <span class="field-type">DATETIME</span>
+                </div>
+            </div>
+
+            <!-- WorkoutType -->
+            <div class="table-card">
+                <div class="table-header">WORKOUT_TYPE (Тип занятия)</div>
+                <div class="field">
+                    <span class="field-name">id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint pk">PK</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">name</span>
+                    <span class="field-type">VARCHAR(100)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">description</span>
+                    <span class="field-type">TEXT</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+            </div>
+
+            <!-- TariffType -->
+            <div class="table-card">
+                <div class="table-header">TARIFF_TYPE (Тип абонемента)</div>
+                <div class="field">
+                    <span class="field-name">id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint pk">PK</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">name</span>
+                    <span class="field-type">VARCHAR(100)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">duration_days</span>
+                    <span class="field-type">INTEGER</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">price</span>
+                    <span class="field-type">DECIMAL(10,2)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">description</span>
+                    <span class="field-type">TEXT</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">is_active</span>
+                    <span class="field-type">BOOLEAN</span>
+                </div>
+            </div>
+
+            <!-- FitnessClass -->
+            <div class="table-card">
+                <div class="table-header">FITNESS_CLASS (Занятие)</div>
+                <div class="field">
+                    <span class="field-name">id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint pk">PK</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">club_id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint fk">FK → CLUB</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">trainer_id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint fk">FK → TRAINER</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">workout_type_id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint fk">FK → WORKOUT_TYPE</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">capacity</span>
+                    <span class="field-type">INTEGER</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">image</span>
+                    <span class="field-type">VARCHAR(100)</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">created_by_id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint fk">FK → USER</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">updated_by_id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint fk">FK → USER</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">created_at</span>
+                    <span class="field-type">DATETIME</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">updated_at</span>
+                    <span class="field-type">DATETIME</span>
+                </div>
+            </div>
+
+            <!-- Membership -->
+            <div class="table-card">
+                <div class="table-header">MEMBERSHIP (Абонемент)</div>
+                <div class="field">
+                    <span class="field-name">id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint pk">PK</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">user_id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint fk">FK → USER</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">tariff_type_id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint fk">FK → TARIFF_TYPE</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">start_date</span>
+                    <span class="field-type">DATE</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">end_date</span>
+                    <span class="field-type">DATE</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">status</span>
+                    <span class="field-type">VARCHAR(10)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">created_by_id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint fk">FK → USER</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">updated_by_id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint fk">FK → USER</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">created_at</span>
+                    <span class="field-type">DATETIME</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">updated_at</span>
+                    <span class="field-type">DATETIME</span>
+                </div>
+            </div>
+
+            <!-- ClassBooking -->
+            <div class="table-card">
+                <div class="table-header">CLASS_BOOKING (Запись на занятие)</div>
+                <div class="field">
+                    <span class="field-name">id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint pk">PK</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">user_id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint fk">FK → USER</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">fitness_class_id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint fk">FK → FITNESS_CLASS</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">status</span>
+                    <span class="field-type">VARCHAR(10)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">start_time</span>
+                    <span class="field-type">DATETIME</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">end_time</span>
+                    <span class="field-type">DATETIME</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">updated_by_id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint fk">FK → USER</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">created_at</span>
+                    <span class="field-type">DATETIME</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">updated_at</span>
+                    <span class="field-type">DATETIME</span>
+                </div>
+            </div>
+
+            <!-- FavoriteClass -->
+            <div class="table-card">
+                <div class="table-header">FAVORITE_CLASS (Избранное)</div>
+                <div class="field">
+                    <span class="field-name">id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint pk">PK</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">user_id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint fk">FK → USER</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">fitness_class_id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint fk">FK → FITNESS_CLASS</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">created_at</span>
+                    <span class="field-type">DATETIME</span>
+                </div>
+            </div>
+
+            <!-- News -->
+            <div class="table-card">
+                <div class="table-header">NEWS (Новости/Акции)</div>
+                <div class="field">
+                    <span class="field-name">id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint pk">PK</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">title</span>
+                    <span class="field-type">VARCHAR(200)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">content</span>
+                    <span class="field-type">TEXT</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">image</span>
+                    <span class="field-type">VARCHAR(100)</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">start_date</span>
+                    <span class="field-type">DATE</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">end_date</span>
+                    <span class="field-type">DATE</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">created_by_id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint fk">FK → USER</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">updated_by_id</span>
+                    <span class="field-type">INTEGER</span>
+                    <span class="field-constraint fk">FK → USER</span>
+                    <span class="optional">(опционально)</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">created_at</span>
+                    <span class="field-type">DATETIME</span>
+                </div>
+                <div class="field">
+                    <span class="field-name">updated_at</span>
+                    <span class="field-type">DATETIME</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="relationships">
+            <h2>🔗 Связи между таблицами</h2>
+            <div class="relationship-list">
+                <div class="relationship-item">
+                    <strong>ROLE (1)</strong> → <strong>USER (N)</strong><br>
+                    Одна роль может быть у многих пользователей
+                </div>
+                <div class="relationship-item">
+                    <strong>USER (1)</strong> → <strong>MEMBERSHIP (N)</strong><br>
+                    Один пользователь может иметь много абонементов
+                </div>
+                <div class="relationship-item">
+                    <strong>USER (1)</strong> → <strong>TRAINER (1)</strong><br>
+                    Один пользователь может быть одним тренером (OneToOne)
+                </div>
+                <div class="relationship-item">
+                    <strong>USER (1)</strong> → <strong>CLASS_BOOKING (N)</strong><br>
+                    Один пользователь может записаться на много занятий
+                </div>
+                <div class="relationship-item">
+                    <strong>USER (1)</strong> → <strong>FAVORITE_CLASS (N)</strong><br>
+                    Один пользователь может добавить много занятий в избранное
+                </div>
+                <div class="relationship-item">
+                    <strong>CLUB (1)</strong> → <strong>TRAINER (N)</strong><br>
+                    Один клуб может нанять много тренеров
+                </div>
+                <div class="relationship-item">
+                    <strong>CLUB (1)</strong> → <strong>FITNESS_CLASS (N)</strong><br>
+                    Один клуб может проводить много занятий
+                </div>
+                <div class="relationship-item">
+                    <strong>TRAINER (1)</strong> → <strong>FITNESS_CLASS (N)</strong><br>
+                    Один тренер может вести много занятий
+                </div>
+                <div class="relationship-item">
+                    <strong>WORKOUT_TYPE (1)</strong> → <strong>FITNESS_CLASS (N)</strong><br>
+                    Один тип занятия может быть у многих занятий
+                </div>
+                <div class="relationship-item">
+                    <strong>FITNESS_CLASS (1)</strong> → <strong>CLASS_BOOKING (N)</strong><br>
+                    На одно занятие может быть много записей
+                </div>
+                <div class="relationship-item">
+                    <strong>FITNESS_CLASS (1)</strong> → <strong>FAVORITE_CLASS (N)</strong><br>
+                    Одно занятие может быть в избранном у многих пользователей
+                </div>
+                <div class="relationship-item">
+                    <strong>TARIFF_TYPE (1)</strong> → <strong>MEMBERSHIP (N)</strong><br>
+                    Один тип тарифа может использоваться в многих абонементах
+                </div>
+                <div class="relationship-item">
+                    <strong>USER (1)</strong> → <strong>CLUB.created_by (N)</strong><br>
+                    Один пользователь может создать много клубов
+                </div>
+                <div class="relationship-item">
+                    <strong>USER (1)</strong> → <strong>NEWS (N)</strong><br>
+                    Один пользователь может создать много новостей
+                </div>
+            </div>
+        </div>
+
+        <div class="legend">
+            <h3>📋 Условные обозначения</h3>
+            <div class="legend-items">
+                <div class="legend-item">
+                    <div class="legend-box pk"></div>
+                    <span><strong>PK</strong> - Primary Key (Первичный ключ)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box fk"></div>
+                    <span><strong>FK</strong> - Foreign Key (Внешний ключ)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-box uk"></div>
+                    <span><strong>UNIQUE</strong> - Уникальное значение</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
